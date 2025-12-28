@@ -1,4 +1,4 @@
-package net.rnsqd.kitVault.database;
+package net.rnsqd.kitVault.services;
 
 public interface DatabaseService {
     void saveAll();
