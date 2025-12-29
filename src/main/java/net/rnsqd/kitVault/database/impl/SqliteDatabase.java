@@ -5,11 +5,15 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import net.rnsqd.kitVault.KitVault;
 import net.rnsqd.kitVault.database.AbstractDatabase;
+import net.rnsqd.kitVault.database.PlayerRecord;
 import net.rnsqd.kitVault.database.Type;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.UUID;
 
 @Getter @Setter
 public final class SqliteDatabase extends AbstractDatabase {
@@ -32,7 +36,19 @@ public final class SqliteDatabase extends AbstractDatabase {
     @Override
     public void cacheAll() {
         final Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM players");
+        while (resultSet.next()) {
+            final String playerName = resultSet.getString("player_name");
+            final String playerUUID = resultSet.getString("player_uuid");
+            final HashMap<String, Long> cooldowns = new HashMap<>();
+            final String[] split = resultSet.getString("cooldowns").split(";");
+            for (String s : split) {
+                String[] splited = s.split(":");
+                cooldowns.put(splited[0], Long.parseLong(splited[1]));
+            }
 
+            this.getPlayerRecords().add(new PlayerRecord(playerName, UUID.fromString(playerUUID), cooldowns));
+        }
     }
 
     @Override

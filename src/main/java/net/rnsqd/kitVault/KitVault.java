@@ -5,7 +5,11 @@ import lombok.Setter;
 import net.rnsqd.kitVault.commands.CommandRouter;
 import net.rnsqd.kitVault.commands.impl.kit.KitCommandRouter;
 import net.rnsqd.kitVault.commands.impl.kitvault.KitVaultCommandRouter;
+import net.rnsqd.kitVault.database.AbstractDatabase;
+import net.rnsqd.kitVault.database.impl.SqliteDatabase;
 import net.rnsqd.kitVault.reload.ReloadResultInstance;
+import net.rnsqd.kitVault.storage.AbstractKitsStorage;
+import net.rnsqd.kitVault.storage.impl.YamlKitsStorage;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -38,6 +42,10 @@ public final class KitVault extends JavaPlugin {
 
     private KitVaultCommandRouter kitVaultCommandRouter;
     private KitCommandRouter kitCommandRouter;
+
+    private AbstractKitsStorage kitsStorage;
+    private AbstractDatabase database;
+
     private boolean successEnabled = false;
 
     @Override
@@ -47,6 +55,8 @@ public final class KitVault extends JavaPlugin {
         this.kitVaultCommandRouter = new KitVaultCommandRouter(this);
         this.kitCommandRouter = new KitCommandRouter(this);
 
+        this.database = new SqliteDatabase(this);
+        this.kitsStorage = new YamlKitsStorage(this);
     }
 
     @Override
