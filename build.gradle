@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id("xyz.jpenilla.run-paper") version "2.3.1"
+    id 'com.gradleup.shadow' version '9.0.0'
 }
 
 group = 'net.rnsqd'
@@ -14,8 +15,43 @@ repositories {
     }
 }
 
+jar {
+    enabled = false
+}
+
+shadowJar {
+    archiveClassifier.set('')
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    exclude 'META-INF/*.SF'
+    exclude 'META-INF/*.DSA'
+    exclude 'META-INF/*.RSA'
+    exclude 'META-INF/LICENSE'
+    exclude 'META-INF/LICENSE.txt'
+    exclude 'META-INF/NOTICE'
+    exclude 'META-INF/NOTICE.txt'
+    exclude 'META-INF/DEPENDENCIES'
+    exclude 'META-INF/DEPENDENCIES.txt'
+
+    relocate 'com.google.code.gson', 'net.rnsqd.kitvault.libs.gson'
+
+    mergeServiceFiles()
+}
+
+build {
+    dependsOn shadowJar
+}
+
+tasks.named('jar') {
+    dependsOn shadowJar
+}
+
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
+
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
+
     compileOnly("org.projectlombok:lombok:1.18.42")
     annotationProcessor("org.projectlombok:lombok:1.18.42")
 

@@ -2,12 +2,15 @@ package net.rnsqd.kitVault;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import net.rnsqd.kitVault.commands.CommandRouter;
 import net.rnsqd.kitVault.commands.impl.kit.KitCommandRouter;
 import net.rnsqd.kitVault.commands.impl.kitvault.KitVaultCommandRouter;
+import net.rnsqd.kitVault.config.impl.MainConfiguration;
 import net.rnsqd.kitVault.converter.json.JsonConvertImpl;
 import net.rnsqd.kitVault.database.AbstractDatabase;
 import net.rnsqd.kitVault.database.impl.SqliteDatabase;
+import net.rnsqd.kitVault.reflect.GoodForReflection;
 import net.rnsqd.kitVault.reload.ReloadResultInstance;
 import net.rnsqd.kitVault.schedulers.cooldown.CooldownSchedulerInstance;
 import net.rnsqd.kitVault.storage.AbstractKitsStorage;
@@ -15,6 +18,11 @@ import net.rnsqd.kitVault.storage.impl.YamlKitsStorage;
 import net.rnsqd.kitVault.updatechecker.UpdateChecker;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.slf4j.Logger;
+import org.slf4j.helpers.NOPLogger;
+
+import java.io.File;
+import java.io.FileReader;
 
 /**
  * Get high, сука (get high, сука)
@@ -41,7 +49,9 @@ import org.bukkit.plugin.java.JavaPlugin;
  * You know, how I play
  */
 @Getter @Setter
-public final class KitVault extends JavaPlugin {
+public final class KitVault extends JavaPlugin implements GoodForReflection {
+
+    private MainConfiguration mainConfiguration;
 
     private KitVaultCommandRouter kitVaultCommandRouter;
     private KitCommandRouter kitCommandRouter;
@@ -56,11 +66,16 @@ public final class KitVault extends JavaPlugin {
 
     private boolean successEnabled = false, successLoaded = false;
 
+    @SneakyThrows
     @Override
     public void onLoad() {
-        this.saveDefaultConfig();
+        this.saveResource("config.json", false);
+        this.saveResource("locale.json", false);
 
-        if (this.getConfig().getBoolean("check-updates"))
+        this.mainConfiguration = new MainConfiguration(this);
+        this.mainConfiguration = this.getJsonConvert().gson.fromJson(new FileReader(new File(getDataFolder(), "config.json")), this.mainConfiguration.getClass());
+
+        if (this.getMainConfiguration().isCheckUpdates())
             this.checkUpdateResultInstance = UpdateChecker.checkUpdate(this);
 
         this.kitVaultCommandRouter = new KitVaultCommandRouter(this);
@@ -122,9 +137,15 @@ public final class KitVault extends JavaPlugin {
     @Override
     public void onDisable() {
         if (this.successEnabled) {
-
+            this.getMainConfiguration().setCheckUpdates(false);
+            this.getMainConfiguration().save(this);
         }
 
+    }
+
+    @Override
+    public Logger goodLogger() {
+        return this.getSLF4JLogger();
     }
 
     public ReloadResultInstance reload() {
