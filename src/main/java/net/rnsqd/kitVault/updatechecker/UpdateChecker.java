@@ -1,5 +1,6 @@
 package net.rnsqd.kitVault.updatechecker;
 
+import com.google.gson.annotations.SerializedName;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import net.rnsqd.kitVault.KitVault;
@@ -36,10 +37,10 @@ public final class UpdateChecker {
 
         GetResult result = plugin.getJsonConvert().gson.fromJson(response.toString(), GetResult.class);
         final String fromDesc = plugin.getDescription().getVersion();
-        return new CheckUpdateResultInstance(fromDesc, result.latestversion(), (!fromDesc.equals(result.latestversion()) ? CheckUpdateResult.LAGGING_VERSION : CheckUpdateResult.LATEST));
+        return new CheckUpdateResultInstance(fromDesc, result.latestVersion(), (!fromDesc.equals(result.latestVersion()) ? CheckUpdateResult.LAGGING_VERSION : CheckUpdateResult.LATEST));
     }
 
-    public record GetResult(String latestversion) { }
+    public record GetResult(@SerializedName(value = "latest-version") String latestVersion) { }
 
     public record CheckUpdateResultInstance(String version, String latestVersion, CheckUpdateResult result) {}
 
