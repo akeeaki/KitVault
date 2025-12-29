@@ -12,7 +12,7 @@ public final class CooldownSchedulerInstance extends BukkitRunnable {
     }
 
     public void start() {
-        this.plugin.getServer().getScheduler().runTaskTimer(plugin, this, 20L, 20L);
+        this.plugin.getServer().getScheduler().runTaskTimer /* устаревшная хуйня, но меня не волнует */(plugin, this, 20L, 20L);
     }
 
     @Override
