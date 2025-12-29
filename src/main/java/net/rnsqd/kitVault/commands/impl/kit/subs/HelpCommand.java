@@ -1,11 +1,13 @@
 package net.rnsqd.kitVault.commands.impl.kit.subs;
 
 import net.rnsqd.kitVault.commands.AbstractCommandInstance;
+import net.rnsqd.kitVault.commands.CommandInformation;
 import net.rnsqd.kitVault.commands.CommandRouter;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
+@CommandInformation(name = "help")
 public final class HelpCommand extends AbstractCommandInstance {
     public HelpCommand(CommandRouter router) {
         super(router);

@@ -5,3 +5,5 @@ api-version: '1.21'
 commands:
   kitvault:
     permission: kitvault.admin
+  kit:
+    permission: kitvault.default

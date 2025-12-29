@@ -5,12 +5,14 @@ import lombok.Setter;
 import net.rnsqd.kitVault.commands.CommandRouter;
 import net.rnsqd.kitVault.commands.impl.kit.KitCommandRouter;
 import net.rnsqd.kitVault.commands.impl.kitvault.KitVaultCommandRouter;
+import net.rnsqd.kitVault.converter.json.JsonConvertImpl;
 import net.rnsqd.kitVault.database.AbstractDatabase;
 import net.rnsqd.kitVault.database.impl.SqliteDatabase;
 import net.rnsqd.kitVault.reload.ReloadResultInstance;
 import net.rnsqd.kitVault.schedulers.cooldown.CooldownSchedulerInstance;
 import net.rnsqd.kitVault.storage.AbstractKitsStorage;
 import net.rnsqd.kitVault.storage.impl.YamlKitsStorage;
+import net.rnsqd.kitVault.updatechecker.UpdateChecker;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -49,11 +51,17 @@ public final class KitVault extends JavaPlugin {
 
     private CooldownSchedulerInstance cooldownSchedulerInstance;
 
-    private boolean successEnabled = false;
+    private final JsonConvertImpl jsonConvert = new JsonConvertImpl();
+    private UpdateChecker.CheckUpdateResultInstance checkUpdateResultInstance;
+
+    private boolean successEnabled = false, successLoaded = false;
 
     @Override
     public void onLoad() {
         this.saveDefaultConfig();
+
+        if (this.getConfig().getBoolean("check-updates"))
+            this.checkUpdateResultInstance = UpdateChecker.checkUpdate(this);
 
         this.kitVaultCommandRouter = new KitVaultCommandRouter(this);
         this.kitCommandRouter = new KitCommandRouter(this);
@@ -62,10 +70,16 @@ public final class KitVault extends JavaPlugin {
         this.kitsStorage = new YamlKitsStorage(this);
 
         this.cooldownSchedulerInstance = new CooldownSchedulerInstance(this);
+        this.successLoaded = true;
     }
 
     @Override
     public void onEnable() {
+        if (!successLoaded) {
+            this.getSLF4JLogger().error("KitVault did not load correctly.");
+            this.getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
         final long startTime = System.currentTimeMillis();
 
         final PluginCommand kitVaultCommand = getCommand("kitvault");
@@ -95,6 +109,14 @@ public final class KitVault extends JavaPlugin {
 
         this.getSLF4JLogger().info("KitVault enabled in {} millis", System.currentTimeMillis() - startTime);
         this.successEnabled = true;
+
+        if (this.checkUpdateResultInstance != null) {
+            if (this.checkUpdateResultInstance.result() == UpdateChecker.CheckUpdateResult.LATEST) {
+                this.getSLF4JLogger().info("You're up to date to the latest version of KitVault!");
+            } else if (this.checkUpdateResultInstance.result() == UpdateChecker.CheckUpdateResult.LAGGING_VERSION) {
+                this.getSLF4JLogger().warn("You're using a lagging version of KitVault! Please, update KitVault to the latest version ({})!", this.checkUpdateResultInstance.latestVersion());
+            }
+        }
     }
 
     @Override

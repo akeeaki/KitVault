@@ -24,7 +24,25 @@ public final class SqliteDatabase extends AbstractDatabase {
         super(kitVault, Type.SQLITE);
 
         this.setConnection(DriverManager.getConnection(String.format("jdbc:sqlite:%s/database.db", kitVault.getDataFolder())));
+        this.validateTable();
         this.cacheAll();
+    }
+
+    @SneakyThrows
+    private void validateTable() {
+        String sql = """
+            
+                CREATE TABLE IF NOT EXISTS players (
+                                                        player_name TEXT NOT NULL,
+                                                        player_uuid TEXT UNIQUE NOT NULL,
+                                                        cooldowns TEXT DEFAULT '',
+                                                        PRIMARY KEY (player_uuid)
+                                                    );
+            """;
+
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute(sql);
+        }
     }
 
     @Override
