@@ -1,16 +1,18 @@
 package net.rnsqd.kitVault.schedulers.cooldown;
 
 import net.rnsqd.kitVault.KitVault;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 
-import java.util.HashMap;
-
-public final class CooldownSchedulerInstance implements Runnable {
+public final class CooldownSchedulerInstance extends BukkitRunnable {
     private final KitVault plugin;
 
     public CooldownSchedulerInstance(final KitVault plugin) {
         this.plugin = plugin;
-        this.plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, this, 20L, 20L);
+    }
+
+    public void start() {
+        this.plugin.getServer().getScheduler().runTaskTimer(plugin, this, 20L, 20L);
     }
 
     @Override

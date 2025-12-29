@@ -8,6 +8,7 @@ import net.rnsqd.kitVault.commands.impl.kitvault.KitVaultCommandRouter;
 import net.rnsqd.kitVault.database.AbstractDatabase;
 import net.rnsqd.kitVault.database.impl.SqliteDatabase;
 import net.rnsqd.kitVault.reload.ReloadResultInstance;
+import net.rnsqd.kitVault.schedulers.cooldown.CooldownSchedulerInstance;
 import net.rnsqd.kitVault.storage.AbstractKitsStorage;
 import net.rnsqd.kitVault.storage.impl.YamlKitsStorage;
 import org.bukkit.command.PluginCommand;
@@ -46,6 +47,8 @@ public final class KitVault extends JavaPlugin {
     private AbstractKitsStorage kitsStorage;
     private AbstractDatabase database;
 
+    private CooldownSchedulerInstance cooldownSchedulerInstance;
+
     private boolean successEnabled = false;
 
     @Override
@@ -57,6 +60,8 @@ public final class KitVault extends JavaPlugin {
 
         this.database = new SqliteDatabase(this);
         this.kitsStorage = new YamlKitsStorage(this);
+
+        this.cooldownSchedulerInstance = new CooldownSchedulerInstance(this);
     }
 
     @Override
@@ -84,6 +89,9 @@ public final class KitVault extends JavaPlugin {
             this.getServer().getPluginManager().disablePlugin(this);
             return;
         }
+
+        this.cooldownSchedulerInstance.start();
+        this.getSLF4JLogger().info("Cooldown scheduler started successfully as timer with timings : 20,20 !");
 
         this.getSLF4JLogger().info("KitVault enabled in {} millis", System.currentTimeMillis() - startTime);
         this.successEnabled = true;
