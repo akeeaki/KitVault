@@ -2,3 +2,6 @@ name: KitVault
 version: '1.0-SNAPSHOT'
 main: net.rnsqd.kitVault.KitVault
 api-version: '1.21'
+commands:
+  kitvault:
+    permission: kitvault.admin
