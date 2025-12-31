@@ -1,5 +1,5 @@
 package net.rnsqd.kitVault.services;
 
-public interface ApplicatorService {
-    Object apply(Object data);
+public interface ApplicatorService<T> {
+    T apply(Object data);
 }

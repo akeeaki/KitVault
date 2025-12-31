@@ -22,7 +22,10 @@ public final class MainConfiguration extends AbstractConfiguration {
             .create();
 
     @SerializedName(value = "check-updates")
-    public boolean checkUpdates = true;
+    public boolean checkUpdates;
+
+    @SerializedName(value = "default-cooldown")
+    public int defaultCooldown;
 
     private transient String currentFileContent = null;
 

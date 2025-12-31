@@ -22,13 +22,19 @@ public final class LocaleConfiguration extends AbstractConfiguration {
     // Start serializing
 
     @SerializedName(value = "prefix")
-    public String prefix = "&6KitVault &7» &f";
+    public String prefix;
 
     @SerializedName(value = "no-perms")
-    public String noPerms = "&cНедостаточно прав на использование данной команды!";
+    public String noPerms;
 
     @SerializedName(value = "save.already-exists")
-    public String save__Already_Exists = "&cКит с таким названием уже существует! Для редактирования существующего набора используйте: &f/kitvault edit <название>";
+    public String save__Already_Exists;
+
+    @SerializedName(value = "save.not-player")
+    public String save__Not_Player;
+
+    @SerializedName(value = "save.saved")
+    public String save__Saved;
 
     // End serializing
 
