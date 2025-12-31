@@ -10,10 +10,7 @@ import org.bukkit.command.TabExecutor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Getter
@@ -42,7 +39,7 @@ public class CommandRouter implements TabExecutor {
             return true;
         }
 
-        commandResult.commandInstance().execute(sender, args, label);
+        commandResult.commandInstance().execute(sender, Arrays.copyOfRange(args, 1, args.length), label);
         return false;
     }
 
@@ -54,7 +51,7 @@ public class CommandRouter implements TabExecutor {
         if (commandResult == null)
             return List.of(String.format("Команда '%s' не найдена", commandName));
 
-        return commandResult.commandInstance().tabComplete(sender, args, label);
+        return commandResult.commandInstance().tabComplete(sender, Arrays.copyOfRange(args, 1, args.length), label);
     }
 
     private List<String> commands() {

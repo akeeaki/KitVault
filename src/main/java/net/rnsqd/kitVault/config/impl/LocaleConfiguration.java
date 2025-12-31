@@ -19,31 +19,34 @@ public final class LocaleConfiguration extends AbstractConfiguration {
             .serializeNulls()
             .create();
 
+    // Start serializing
+
     @SerializedName(value = "prefix")
     public String prefix = "&6KitVault &7» &f";
 
     @SerializedName(value = "no-perms")
     public String noPerms = "&cНедостаточно прав на использование данной команды!";
 
+    @SerializedName(value = "save.already-exists")
+    public String save__Already_Exists = "&cКит с таким названием уже существует! Для редактирования существующего набора используйте: &f/kitvault edit <название>";
+
+    // End serializing
+
     private transient String currentFileContent = null;
 
     public LocaleConfiguration(KitVault kitVault) {
-        super(kitVault, new File(kitVault.getDataFolder(), "config.json"));
+        super(kitVault, new File(kitVault.getDataFolder(), "locale.json"));
         this.goodForReflection = kitVault;
-        this.goodForReflection.goodLogger().info("Good for Reflection is initialized for config class {}.", this.getClass().getName());
+        this.goodForReflection.goodLogger().info("Good for Reflection is initialized for locale class {}.", this.getClass().getName());
     }
 
     @Override
     public void reload(GoodForReflection goodForReflection) {
-        try (Reader reader = new FileReader(new File(goodForReflection.getDataFolder(), "config.json"))) {
-            MainConfiguration loaded = GSON.fromJson(reader, MainConfiguration.class);
-            if (loaded != null) {
-                this.checkUpdates = loaded.checkUpdates;
-            }
-
-            currentFileContent = readFileContent(new File(goodForReflection.getDataFolder(), "config.json"));
+        try (Reader reader = new FileReader(new File(goodForReflection.getDataFolder(), "locale.json"))) {
+            LocaleConfiguration loaded = GSON.fromJson(reader, LocaleConfiguration.class);
+            currentFileContent = readFileContent(new File(goodForReflection.getDataFolder(), "locale.json"));
         } catch (Exception e) {
-            goodForReflection.goodLogger().warn("Error while loading config.json: {}", e.getMessage());
+            goodForReflection.goodLogger().warn("Error while loading locale.json: {}", e.getMessage());
             save(goodForReflection);
         }
     }
@@ -56,11 +59,11 @@ public final class LocaleConfiguration extends AbstractConfiguration {
             return;
         }
 
-        try (Writer writer = new FileWriter(new File(goodForReflection.getDataFolder(), "config.json"))) {
+        try (Writer writer = new FileWriter(new File(goodForReflection.getDataFolder(), "locale.json"))) {
             writer.write(newJson);
             currentFileContent = newJson;
         } catch (IOException e) {
-            goodForReflection.goodLogger().error("Error while saving config.json: {}", e.getMessage());
+            goodForReflection.goodLogger().error("Error while saving locale.json: {}", e.getMessage());
             e.printStackTrace();
         }
     }

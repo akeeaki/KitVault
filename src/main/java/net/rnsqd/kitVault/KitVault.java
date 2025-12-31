@@ -3,9 +3,12 @@ package net.rnsqd.kitVault;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.rnsqd.kitVault.applicators.MiniMessageApplicator;
 import net.rnsqd.kitVault.commands.CommandRouter;
 import net.rnsqd.kitVault.commands.impl.kit.KitCommandRouter;
 import net.rnsqd.kitVault.commands.impl.kitvault.KitVaultCommandRouter;
+import net.rnsqd.kitVault.config.impl.LocaleConfiguration;
 import net.rnsqd.kitVault.config.impl.MainConfiguration;
 import net.rnsqd.kitVault.converter.json.JsonConvertImpl;
 import net.rnsqd.kitVault.database.AbstractDatabase;
@@ -52,6 +55,7 @@ import java.io.FileReader;
 public final class KitVault extends JavaPlugin implements GoodForReflection {
 
     private MainConfiguration mainConfiguration;
+    private LocaleConfiguration localeConfiguration;
 
     private KitVaultCommandRouter kitVaultCommandRouter;
     private KitCommandRouter kitCommandRouter;
@@ -64,16 +68,23 @@ public final class KitVault extends JavaPlugin implements GoodForReflection {
     private final JsonConvertImpl jsonConvert = new JsonConvertImpl();
     private UpdateChecker.CheckUpdateResultInstance checkUpdateResultInstance;
 
+    private MiniMessageApplicator miniMessageApplicator = new MiniMessageApplicator();
+
     private boolean successEnabled = false, successLoaded = false;
 
     @SneakyThrows
     @Override
     public void onLoad() {
+        this.getSLF4JLogger().info(this.getMiniMessageApplicator().toLegacy("&aInvoked onLoad method, loading.."));
+
         this.saveResource("config.json", false);
         this.saveResource("locale.json", false);
 
         this.mainConfiguration = new MainConfiguration(this);
         this.mainConfiguration = this.getJsonConvert().gson.fromJson(new FileReader(new File(getDataFolder(), "config.json")), this.mainConfiguration.getClass());
+
+        this.localeConfiguration = new LocaleConfiguration(this);
+        this.localeConfiguration = this.getJsonConvert().gson.fromJson(new FileReader(new File(getDataFolder(), "config.json")), this.localeConfiguration.getClass());
 
         if (this.getMainConfiguration().isCheckUpdates())
             this.checkUpdateResultInstance = UpdateChecker.checkUpdate(this);
@@ -90,6 +101,8 @@ public final class KitVault extends JavaPlugin implements GoodForReflection {
 
     @Override
     public void onEnable() {
+        this.getSLF4JLogger().info(this.getMiniMessageApplicator().toLegacy("&aInvoked onEnable method, enabling.."));
+
         if (!successLoaded) {
             this.getSLF4JLogger().error("KitVault did not load correctly.");
             this.getServer().getPluginManager().disablePlugin(this);
@@ -132,13 +145,19 @@ public final class KitVault extends JavaPlugin implements GoodForReflection {
                 this.getSLF4JLogger().warn("You're using a lagging version of KitVault! Please, update KitVault to the latest version ({})!", this.checkUpdateResultInstance.latestVersion());
             }
         }
+
+        this.getSLF4JLogger().info(this.getMiniMessageApplicator().toLegacy("&2KitVault successfully enabled, enjoy!"));
     }
 
     @Override
     public void onDisable() {
+        this.getSLF4JLogger().info(this.getMiniMessageApplicator().toLegacy("&cInvoked onDisable method, disabling.."));
         if (this.successEnabled) {
-            this.getMainConfiguration().setCheckUpdates(false);
             this.getMainConfiguration().save(this);
+
+            this.getSLF4JLogger().info(this.getMiniMessageApplicator().toLegacy("&4KitVault disabled, goodbye!"));
+        } else {
+            this.getSLF4JLogger().info(this.getMiniMessageApplicator().toLegacy("&cKitVault not initialized correctly, nothing to disable!"));
         }
 
     }
