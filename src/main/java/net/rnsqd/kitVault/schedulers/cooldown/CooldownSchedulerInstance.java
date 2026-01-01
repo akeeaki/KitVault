@@ -4,6 +4,9 @@ import net.rnsqd.kitVault.KitVault;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 
+import java.util.Iterator;
+import java.util.Map;
+
 public final class CooldownSchedulerInstance extends BukkitRunnable {
     private final KitVault plugin;
 
@@ -19,14 +22,18 @@ public final class CooldownSchedulerInstance extends BukkitRunnable {
     @Override
     public void run() {
         this.plugin.getDatabase().getPlayerRecords().forEach(p -> {
-            if (p.kitsCooldowns() != null) {
-                p.kitsCooldowns().forEach((key, value) -> {
-                    final long newCooldown = value - 1;
-                    if (newCooldown <= 0)
-                        p.kitsCooldowns().remove(key);
-                    else
-                        p.kitsCooldowns().put(key, newCooldown);
-                });
+            if (p.kitsCooldowns() != null && !p.kitsCooldowns().isEmpty()) {
+                Iterator<Map.Entry<String, Long>> iterator = p.kitsCooldowns().entrySet().iterator();
+                while (iterator.hasNext()) {
+                    Map.Entry<String, Long> entry = iterator.next();
+                    final long newCooldown = entry.getValue() - 1;
+                    if (newCooldown <= 0) {
+                        iterator.remove();
+                    } else {
+                        entry.setValue(newCooldown);
+                    }
+                    plugin.getDatabase().saveAll();
+                }
             }
         });
     }

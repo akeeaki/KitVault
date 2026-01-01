@@ -41,6 +41,7 @@ public final class ClaimCommand extends AbstractCommandInstance {
         if (isBypass || isAvailable) {
             kitRecord.give(player);
             playerRecord.kitsCooldowns().put(args[0], kitRecord.cooldown());
+            kitVault.getDatabase().saveAll();
             sender.sendMessage(kitVault.getMiniMessageApplicator().apply(kitVault.getLocaleConfiguration().claim__Claimed.replaceAll("#kit#", args[0])));
         } else {
             sender.sendMessage(

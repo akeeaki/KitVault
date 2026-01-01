@@ -7,7 +7,6 @@ import net.rnsqd.kitVault.commands.AbstractCommandInstance;
 import net.rnsqd.kitVault.commands.CommandInformation;
 import net.rnsqd.kitVault.commands.CommandRouter;
 import net.rnsqd.kitVault.kit.KitRecord;
-import net.rnsqd.kitVault.storage.AbstractKitsStorage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -26,6 +25,7 @@ public final class SaveCommand extends AbstractCommandInstance {
     @Override
     public boolean execute(CommandSender sender, String[] args, String label) {
         final KitVault vault = this.getRouter().getKitVault();
+
         final KitRecord record = vault.getKitsStorage().getRecord(args[0]);
 
         if (record != null) {
@@ -43,8 +43,9 @@ public final class SaveCommand extends AbstractCommandInstance {
         final PlayerInventory inventory = player.getInventory();
         for (int i = 0; i < inventory.getSize(); i++) {
             final ItemStack item = inventory.getItem(i);
-            if (item != null)
+            if (item != null) {
                 items.put(i, item.clone());
+            }
         }
 
         final KitRecord newRecord = new KitRecord(args[0], items, vault.getMainConfiguration().defaultCooldown);

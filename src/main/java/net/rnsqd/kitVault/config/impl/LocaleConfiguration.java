@@ -23,33 +23,33 @@ public final class LocaleConfiguration extends AbstractConfiguration {
 
     // Main
     @SerializedName(value = "prefix")
-    public String prefix;
+    public String prefix = "<gold>KitVault <gray>» <white>";
 
     @SerializedName(value = "no-perms")
-    public String noPerms;
+    public String noPerms = "<red>Недостаточно прав на использование данной команды!";
 
     // Save
     @SerializedName(value = "save.already-exists")
-    public String save__Already_Exists;
+    public String save__Already_Exists = "<red>Кит с таким названием уже существует! Для редактирования существующего набора используйте: <white>/kitvault edit <название>";
 
     @SerializedName(value = "save.not-player")
-    public String save__Not_Player;
+    public String save__Not_Player = "<red>Эта команда доступна только игрокам!";
 
     @SerializedName(value = "save.saved")
-    public String save__Saved;
+    public String save__Saved = "<green>Вы успешно сохранили новый кит #kit#";
 
     // Claim
     @SerializedName(value = "claim.not-player")
-    public String claim__Not_Player;
+    public String claim__Not_Player = "<red>Эта команда доступна только игрокам!";
 
     @SerializedName(value = "claim.claimed")
-    public String claim__Claimed;
+    public String claim__Claimed = "<green>Вы успешно взяли кит #kit#!";
 
     @SerializedName(value = "claim.not-found")
-    public String claim__Not_Found;
+    public String claim__Not_Found = "<red>Кит #kit# не найден!";
 
     @SerializedName(value = "claim.cooldown")
-    public String claim__Cooldown;
+    public String claim__Cooldown = "<red>Кит #kit# на перезарядке! Подождите ещё <gold>#formatted_cooldown#";
 
     // End serializing
 

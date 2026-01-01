@@ -22,16 +22,16 @@ public final class MainConfiguration extends AbstractConfiguration {
             .create();
 
     @SerializedName(value = "check-updates")
-    public boolean checkUpdates;
+    public boolean checkUpdates = true;
 
     @SerializedName(value = "disable-setup-environment")
-    public boolean disableSetupEnvironment;
+    public boolean disableSetupEnvironment = false;
 
     @SerializedName(value = "metrics-use")
-    public String metricsUse;
+    public String metricsUse = "bstats";
 
     @SerializedName(value = "default-cooldown")
-    public int defaultCooldown;
+    public int defaultCooldown = 10;
 
     private transient String currentFileContent = null;
 

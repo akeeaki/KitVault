@@ -9,12 +9,10 @@ import net.rnsqd.kitVault.database.PlayerRecord;
 import net.rnsqd.kitVault.database.Type;
 import net.rnsqd.kitVault.kit.KitRecord;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Getter @Setter
 public final class SqliteDatabase extends AbstractDatabase {
@@ -46,9 +44,42 @@ public final class SqliteDatabase extends AbstractDatabase {
         }
     }
 
+    @SneakyThrows
     @Override
     public void saveAll() {
+        final long start = System.currentTimeMillis();
 
+        String sql = """
+        INSERT INTO players (player_name, player_uuid, cooldowns)
+        VALUES (?, ?, ?)
+        ON CONFLICT(player_uuid) DO UPDATE SET
+            player_name = excluded.player_name,
+            cooldowns = excluded.cooldowns;
+        """;
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            for (PlayerRecord playerRecord : this.getPlayerRecords()) {
+                pstmt.setString(1, playerRecord.name());
+                pstmt.setString(2, playerRecord.uuid().toString());
+                pstmt.setString(3, formatCooldowns(playerRecord.kitsCooldowns()));
+
+                pstmt.addBatch();
+            }
+
+            pstmt.executeBatch();
+        }
+
+        this.getKitVault().getSLF4JLogger().info("Saved all players data in {} millis", System.currentTimeMillis() - start);
+    }
+
+    private String formatCooldowns(HashMap<String, Long> cooldowns) {
+        StringBuilder sb = new StringBuilder();
+        AtomicInteger counter = new AtomicInteger(0);
+        cooldowns.forEach((kit, cooldown) -> {
+            sb.append(kit).append(":").append(cooldown).append(counter.get() == cooldowns.size() - 1 ? "" : ";");
+            counter.incrementAndGet();
+        });
+        return sb.toString();
     }
 
     @SneakyThrows
@@ -61,9 +92,12 @@ public final class SqliteDatabase extends AbstractDatabase {
             final String playerUUID = resultSet.getString("player_uuid");
             final HashMap<String, Long> cooldowns = new HashMap<>();
             final String[] split = resultSet.getString("cooldowns").split(";");
-            for (String s : split) {
-                String[] splited = s.split(":");
-                cooldowns.put(splited[0], Long.parseLong(splited[1]));
+            if (split.length >= 1) {
+                for (String s : split) {
+                    String[] splited = s.split(":");
+                    if (splited[1] == null) return;
+                    cooldowns.put(splited[0], Long.parseLong(splited[1]));
+                }
             }
 
             this.getPlayerRecords().add(new PlayerRecord(playerName, UUID.fromString(playerUUID), cooldowns));
