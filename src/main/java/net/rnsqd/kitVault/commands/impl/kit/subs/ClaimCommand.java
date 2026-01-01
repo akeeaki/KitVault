@@ -4,6 +4,7 @@ import net.rnsqd.kitVault.KitVault;
 import net.rnsqd.kitVault.commands.AbstractCommandInstance;
 import net.rnsqd.kitVault.commands.CommandInformation;
 import net.rnsqd.kitVault.commands.CommandRouter;
+import net.rnsqd.kitVault.database.PlayerRecord;
 import net.rnsqd.kitVault.kit.KitRecord;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -32,18 +33,20 @@ public final class ClaimCommand extends AbstractCommandInstance {
             return true;
         }
 
+        final PlayerRecord playerRecord = kitVault.getDatabase().getRecord(player);
+
         boolean isBypass = player.hasPermission("kitvault.bypass.cooldown") || player.hasPermission("kitvault.bypass.all");
-        boolean isAvailable = !kitVault.getDatabase().isCooldown(player.getName(), kitRecord);
+        boolean isAvailable = !playerRecord.kitsCooldowns().containsKey(args[0]);
 
         if (isBypass || isAvailable) {
             kitRecord.give(player);
-            kitVault.getDatabase().addCooldown(player.getName(), kitRecord);
+            playerRecord.kitsCooldowns().put(args[0], kitRecord.cooldown());
             sender.sendMessage(kitVault.getMiniMessageApplicator().apply(kitVault.getLocaleConfiguration().claim__Claimed.replaceAll("#kit#", args[0])));
         } else {
             sender.sendMessage(
                     kitVault.getMiniMessageApplicator().apply(kitVault.getLocaleConfiguration().claim__Cooldown
                             .replaceAll("#kit#", args[0])
-                            .replaceAll("#formatted_cooldown#", kitVault.getTimeFormatApplicator().apply(kitVault.getDatabase().getCooldown(player.getName(), kitRecord)))
+                            .replaceAll("#formatted_cooldown#", kitVault.getTimeFormatApplicator().apply(playerRecord.kitsCooldowns().get(args[0])))
                     )
             );
 

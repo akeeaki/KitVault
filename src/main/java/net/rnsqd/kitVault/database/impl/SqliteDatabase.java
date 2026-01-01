@@ -79,19 +79,4 @@ public final class SqliteDatabase extends AbstractDatabase {
     public void save(String player) {
 
     }
-
-    @Override
-    public boolean isCooldown(String player, KitRecord kitRecord) {
-        return false;
-    }
-
-    @Override
-    public long getCooldown(String player, KitRecord kitRecord) {
-        return 0;
-    }
-
-    @Override
-    public void addCooldown(String player, KitRecord kitRecord) {
-
-    }
 }
