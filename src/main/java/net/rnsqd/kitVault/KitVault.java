@@ -3,9 +3,7 @@ package net.rnsqd.kitVault;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.rnsqd.kitVault.applicators.MiniMessageApplicator;
-import net.rnsqd.kitVault.commands.CommandRouter;
 import net.rnsqd.kitVault.commands.impl.kit.KitCommandRouter;
 import net.rnsqd.kitVault.commands.impl.kitvault.KitVaultCommandRouter;
 import net.rnsqd.kitVault.config.impl.LocaleConfiguration;
@@ -13,6 +11,12 @@ import net.rnsqd.kitVault.config.impl.MainConfiguration;
 import net.rnsqd.kitVault.converter.json.JsonConvertImpl;
 import net.rnsqd.kitVault.database.AbstractDatabase;
 import net.rnsqd.kitVault.database.impl.SqliteDatabase;
+import net.rnsqd.kitVault.environment.Environment;
+import net.rnsqd.kitVault.environment.EnvironmentClass;
+import net.rnsqd.kitVault.environment.EnvironmentFetcher;
+import net.rnsqd.kitVault.environment.impl.WindowsEnvironmentClass;
+import net.rnsqd.kitVault.metrics.Metrica;
+import net.rnsqd.kitVault.metrics.impl.BStatsMetrics;
 import net.rnsqd.kitVault.reflect.GoodForReflection;
 import net.rnsqd.kitVault.reload.ReloadResultInstance;
 import net.rnsqd.kitVault.schedulers.cooldown.CooldownSchedulerInstance;
@@ -22,7 +26,6 @@ import net.rnsqd.kitVault.updatechecker.UpdateChecker;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.slf4j.Logger;
-import org.slf4j.helpers.NOPLogger;
 
 import java.io.File;
 import java.io.FileReader;
@@ -53,6 +56,9 @@ import java.io.FileReader;
  */
 @Getter @Setter
 public final class KitVault extends JavaPlugin implements GoodForReflection {
+
+    private Environment<? extends EnvironmentClass> environment;
+    private Metrica metrica;
 
     private MainConfiguration mainConfiguration;
     private LocaleConfiguration localeConfiguration;
@@ -86,6 +92,31 @@ public final class KitVault extends JavaPlugin implements GoodForReflection {
         this.localeConfiguration = new LocaleConfiguration(this);
         this.localeConfiguration = this.getJsonConvert().gson.fromJson(new FileReader(new File(getDataFolder(), "locale.json")), this.localeConfiguration.getClass());
 
+        if (!this.getMainConfiguration().disableSetupEnvironment) {
+            this.getSLF4JLogger().info(this.getMiniMessageApplicator().fromLegacy("&aSetting up the environment.."));
+            if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+                this.setEnvironment(EnvironmentFetcher.fetchEnv(WindowsEnvironmentClass.class));
+            }
+
+            if (environment == null) {
+                this.getSLF4JLogger().info(this.getMiniMessageApplicator().fromLegacy("&4Your environment not supported yet!"));
+                this.getSLF4JLogger().info(this.getMiniMessageApplicator().fromLegacy("&4You can disable environment setup in the configuration"));
+                this.getSLF4JLogger().info(this.getMiniMessageApplicator().fromLegacy("&4But this can produce a problems.."));
+                this.getSLF4JLogger().info(this.getMiniMessageApplicator().fromLegacy("&4"));
+                this.getSLF4JLogger().info(this.getMiniMessageApplicator().fromLegacy("&4Your environment from properties [System.getProperty method]: "));
+                this.getSLF4JLogger().info(this.getMiniMessageApplicator().fromLegacy("&4 - OS: " + System.getProperty("os.name")));
+                this.getSLF4JLogger().info(this.getMiniMessageApplicator().fromLegacy("&4 - Architecture: " + System.getProperty("os.arch")));
+
+                return;
+            }
+
+            this.getSLF4JLogger().info(this.getMiniMessageApplicator().fromLegacy("&aFetched environment " + this.getEnvironment().getClass().getName()));
+            this.getSLF4JLogger().info(this.getMiniMessageApplicator().fromLegacy("&aSystem environment: " + this.getEnvironment().systemEnvironment().toString()));
+            this.getSLF4JLogger().info(this.getMiniMessageApplicator().fromLegacy("&aServer environment: " + this.getEnvironment().serverEnvironment().toString()));
+        } else {
+            this.getSLF4JLogger().warn(this.getMiniMessageApplicator().fromLegacy("&cYou disabled a setup environment, this can produce a problems!"));
+        }
+
         if (this.getMainConfiguration().isCheckUpdates())
             this.checkUpdateResultInstance = UpdateChecker.checkUpdate(this);
 
@@ -96,6 +127,21 @@ public final class KitVault extends JavaPlugin implements GoodForReflection {
         this.kitsStorage = new YamlKitsStorage(this);
 
         this.cooldownSchedulerInstance = new CooldownSchedulerInstance(this);
+
+        final String metricsUse = this.getMainConfiguration().metricsUse;
+        if (metricsUse.equals("none")) {
+            this.setMetrica(null);
+            this.getSLF4JLogger().warn(this.getMiniMessageApplicator().fromLegacy("&aMetrica disabled by user"));
+        } else {
+            switch (metricsUse.toLowerCase()) {
+                case "bstats" ->
+                    this.setMetrica(new BStatsMetrics());
+            }
+
+            this.getSLF4JLogger().warn(this.getMiniMessageApplicator().fromLegacy("&aSetted up metrica: " + this.metrica.getClass().getName()));
+            this.metrica.load(this);
+        }
+
         this.successLoaded = true;
     }
 

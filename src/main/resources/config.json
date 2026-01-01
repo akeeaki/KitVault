@@ -1,4 +1,6 @@
 {
   "check-updates": true,
-  "default-cooldown": 10
+  "disable-setup-environment": false,
+  "default-cooldown": 10,
+  "metrics-use": "bstats"
 }

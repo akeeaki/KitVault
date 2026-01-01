@@ -24,6 +24,12 @@ public final class MainConfiguration extends AbstractConfiguration {
     @SerializedName(value = "check-updates")
     public boolean checkUpdates;
 
+    @SerializedName(value = "disable-setup-environment")
+    public boolean disableSetupEnvironment;
+
+    @SerializedName(value = "metrics-use")
+    public String metricsUse;
+
     @SerializedName(value = "default-cooldown")
     public int defaultCooldown;
 
