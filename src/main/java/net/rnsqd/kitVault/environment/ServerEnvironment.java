@@ -1,4 +1,7 @@
 package net.rnsqd.kitVault.environment;
 
-public record ServerEnvironment<T extends EnvironmentClass>() {
+import org.bukkit.Bukkit;
+
+public record ServerEnvironment<T extends EnvironmentClass>(String bukkitVersion, String version, String minecraftVersion) {
+
 }
