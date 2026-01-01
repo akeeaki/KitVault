@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.rnsqd.kitVault.services.ApplicatorService;
+import org.bukkit.ChatColor;
 
 public final class MiniMessageApplicator implements ApplicatorService<Component> {
     private final MiniMessage mini = MiniMessage.miniMessage();
@@ -22,5 +23,10 @@ public final class MiniMessageApplicator implements ApplicatorService<Component>
 
     public String toLegacy(String text) {
         return legacy.serialize(apply(text));
+    }
+
+    // Not good because this method using a deprecated class(-es)
+    public String fromLegacy(String text) {
+        return ChatColor.translateAlternateColorCodes('&', text);
     }
 }

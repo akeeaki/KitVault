@@ -75,7 +75,7 @@ public final class KitVault extends JavaPlugin implements GoodForReflection {
     @SneakyThrows
     @Override
     public void onLoad() {
-        this.getSLF4JLogger().info(this.getMiniMessageApplicator().toLegacy("&aInvoked onLoad method, loading.."));
+        this.getSLF4JLogger().info(this.getMiniMessageApplicator().fromLegacy("&aInvoked onLoad method, loading.."));
 
         this.saveResource("config.json", false);
         this.saveResource("locale.json", false);
@@ -84,7 +84,7 @@ public final class KitVault extends JavaPlugin implements GoodForReflection {
         this.mainConfiguration = this.getJsonConvert().gson.fromJson(new FileReader(new File(getDataFolder(), "config.json")), this.mainConfiguration.getClass());
 
         this.localeConfiguration = new LocaleConfiguration(this);
-        this.localeConfiguration = this.getJsonConvert().gson.fromJson(new FileReader(new File(getDataFolder(), "config.json")), this.localeConfiguration.getClass());
+        this.localeConfiguration = this.getJsonConvert().gson.fromJson(new FileReader(new File(getDataFolder(), "locale.json")), this.localeConfiguration.getClass());
 
         if (this.getMainConfiguration().isCheckUpdates())
             this.checkUpdateResultInstance = UpdateChecker.checkUpdate(this);
@@ -101,7 +101,7 @@ public final class KitVault extends JavaPlugin implements GoodForReflection {
 
     @Override
     public void onEnable() {
-        this.getSLF4JLogger().info(this.getMiniMessageApplicator().toLegacy("&aInvoked onEnable method, enabling.."));
+        this.getSLF4JLogger().info(this.getMiniMessageApplicator().fromLegacy("&aInvoked onEnable method, enabling.."));
 
         if (!successLoaded) {
             this.getSLF4JLogger().error("KitVault did not load correctly.");
@@ -146,18 +146,17 @@ public final class KitVault extends JavaPlugin implements GoodForReflection {
             }
         }
 
-        this.getSLF4JLogger().info(this.getMiniMessageApplicator().toLegacy("&2KitVault successfully enabled, enjoy!"));
+        this.getSLF4JLogger().info(this.getMiniMessageApplicator().fromLegacy("&2KitVault successfully enabled, enjoy!"));
     }
 
     @Override
     public void onDisable() {
-        this.getSLF4JLogger().info(this.getMiniMessageApplicator().toLegacy("&cInvoked onDisable method, disabling.."));
+        this.getSLF4JLogger().info(this.getMiniMessageApplicator().fromLegacy("&cInvoked onDisable method, disabling.."));
         if (this.successEnabled) {
             this.getMainConfiguration().save(this);
-
-            this.getSLF4JLogger().info(this.getMiniMessageApplicator().toLegacy("&4KitVault disabled, goodbye!"));
+            this.getSLF4JLogger().info(this.getMiniMessageApplicator().fromLegacy("&4KitVault disabled, goodbye!"));
         } else {
-            this.getSLF4JLogger().info(this.getMiniMessageApplicator().toLegacy("&cKitVault not initialized correctly, nothing to disable!"));
+            this.getSLF4JLogger().info(this.getMiniMessageApplicator().fromLegacy("&cKitVault not initialized correctly, nothing to disable!"));
         }
 
     }
