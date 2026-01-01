@@ -5,8 +5,10 @@ import lombok.Getter;
 import lombok.Setter;
 import net.rnsqd.kitVault.KitVault;
 import net.rnsqd.kitVault.services.DatabaseService;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -25,6 +27,13 @@ public abstract class AbstractDatabase implements DatabaseService {
             if (playerRecord.name().equalsIgnoreCase(playerName))
                 record.set(playerRecord);
         });
+
+        if (record.get() == null) {
+            PlayerRecord playerRecord = new PlayerRecord(playerName, Bukkit.getOfflinePlayer(playerName).getUniqueId(), new HashMap<>());
+            this.playerRecords.add(playerRecord);
+            record.set(playerRecord);
+        }
+
         return record.get();
     }
 
