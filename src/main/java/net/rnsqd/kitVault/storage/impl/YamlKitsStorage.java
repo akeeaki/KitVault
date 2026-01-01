@@ -12,6 +12,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 
 @Getter @Setter
@@ -21,6 +22,10 @@ public final class YamlKitsStorage extends AbstractKitsStorage {
 
     public YamlKitsStorage(KitVault kitVault) {
         super(kitVault, Type.YAML);
+
+        if (!file.exists()) {
+            this.getKitVault().saveResource("kits.yml", false);
+        }
 
         this.setCfg(YamlConfiguration.loadConfiguration(getFile()));
         this.cacheAll();
@@ -32,9 +37,11 @@ public final class YamlKitsStorage extends AbstractKitsStorage {
         if (this.getRecord(kitRecord.name()) != null) {
             this.getKitRecords().remove(kitRecord);
             this.getKitRecords().add(kitRecord);
+            this.saveAll();
             return SaveResult.UPDATED_EXISTS;
         } else  {
             this.getKitRecords().add(kitRecord);
+            this.saveAll();
             return SaveResult.CREATED_NEW;
         }
     }
@@ -88,6 +95,11 @@ public final class YamlKitsStorage extends AbstractKitsStorage {
         this.getKitRecords().forEach(record -> {
             this.getCfg().set("kits." + record.name() + ".cooldown", record.cooldown());
             record.items().forEach((slot, stack) -> this.getCfg().set("kits." + record.name() + ".items." + slot, stack));
+            try {
+                this.getCfg().save(this.getFile());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         });
 
         this.getKitVault().getSLF4JLogger().info("Saved all kits in {} millis", System.currentTimeMillis() - start);

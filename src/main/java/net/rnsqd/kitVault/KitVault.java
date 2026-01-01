@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import net.rnsqd.kitVault.applicators.MiniMessageApplicator;
+import net.rnsqd.kitVault.applicators.TimeFormatApplicator;
 import net.rnsqd.kitVault.commands.impl.kit.KitCommandRouter;
 import net.rnsqd.kitVault.commands.impl.kitvault.KitVaultCommandRouter;
 import net.rnsqd.kitVault.config.impl.LocaleConfiguration;
@@ -75,6 +76,7 @@ public final class KitVault extends JavaPlugin implements GoodForReflection {
     private UpdateChecker.CheckUpdateResultInstance checkUpdateResultInstance;
 
     private MiniMessageApplicator miniMessageApplicator = new MiniMessageApplicator();
+    private TimeFormatApplicator timeFormatApplicator = new TimeFormatApplicator();
 
     private boolean successEnabled = false, successLoaded = false;
 
@@ -110,7 +112,7 @@ public final class KitVault extends JavaPlugin implements GoodForReflection {
                 return;
             }
 
-            this.getSLF4JLogger().info(this.getMiniMessageApplicator().fromLegacy("&aFetched environment " + this.getEnvironment().getClass().getName()));
+            this.getSLF4JLogger().info(this.getMiniMessageApplicator().fromLegacy("&aFetched environment " + this.getEnvironment().environment().getClass().getName()));
             this.getSLF4JLogger().info(this.getMiniMessageApplicator().fromLegacy("&aSystem environment: " + this.getEnvironment().systemEnvironment().toString()));
             this.getSLF4JLogger().info(this.getMiniMessageApplicator().fromLegacy("&aServer environment: " + this.getEnvironment().serverEnvironment().toString()));
         } else {
@@ -200,6 +202,11 @@ public final class KitVault extends JavaPlugin implements GoodForReflection {
         this.getSLF4JLogger().info(this.getMiniMessageApplicator().fromLegacy("&cInvoked onDisable method, disabling.."));
         if (this.successEnabled) {
             this.getMainConfiguration().save(this);
+            this.getLocaleConfiguration().save(this);
+
+            this.getKitsStorage().saveAll();
+            this.getDatabase().saveAll();
+
             this.getSLF4JLogger().info(this.getMiniMessageApplicator().fromLegacy("&4KitVault disabled, goodbye!"));
         } else {
             this.getSLF4JLogger().info(this.getMiniMessageApplicator().fromLegacy("&cKitVault not initialized correctly, nothing to disable!"));

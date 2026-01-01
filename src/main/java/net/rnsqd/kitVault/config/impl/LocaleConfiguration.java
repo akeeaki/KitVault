@@ -21,12 +21,14 @@ public final class LocaleConfiguration extends AbstractConfiguration {
 
     // Start serializing
 
+    // Main
     @SerializedName(value = "prefix")
     public String prefix;
 
     @SerializedName(value = "no-perms")
     public String noPerms;
 
+    // Save
     @SerializedName(value = "save.already-exists")
     public String save__Already_Exists;
 
@@ -35,6 +37,19 @@ public final class LocaleConfiguration extends AbstractConfiguration {
 
     @SerializedName(value = "save.saved")
     public String save__Saved;
+
+    // Claim
+    @SerializedName(value = "claim.not-player")
+    public String claim__Not_Player;
+
+    @SerializedName(value = "claim.claimed")
+    public String claim__Claimed;
+
+    @SerializedName(value = "claim.not-found")
+    public String claim__Not_Found;
+
+    @SerializedName(value = "claim.cooldown")
+    public String claim__Cooldown;
 
     // End serializing
 

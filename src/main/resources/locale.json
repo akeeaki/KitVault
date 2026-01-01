@@ -3,5 +3,9 @@
   "no-perms": "<red>Недостаточно прав на использование данной команды!",
   "save.already-exists": "<red>Кит с таким названием уже существует! Для редактирования существующего набора используйте: <white>/kitvault edit <название>",
   "save.not-player": "<red>Эта команда доступна только игрокам!",
-  "save.saved": "<green>Вы успешно сохранили новый кит #kit#"
+  "save.saved": "<green>Вы успешно сохранили новый кит #kit#",
+  "claim.not-player": "<red>Эта команда доступна только игрокам!",
+  "claim.claimed": "<green>Вы успешно взяли кит #kit#!",
+  "claim.not-found": "<red>Кит #kit# не найден!",
+  "claim.cooldown": "<red>Кит #kit# на перезарядке! Подождите ещё <gold>#formatted_cooldown#"
 }

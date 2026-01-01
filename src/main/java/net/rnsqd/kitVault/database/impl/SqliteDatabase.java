@@ -7,6 +7,7 @@ import net.rnsqd.kitVault.KitVault;
 import net.rnsqd.kitVault.database.AbstractDatabase;
 import net.rnsqd.kitVault.database.PlayerRecord;
 import net.rnsqd.kitVault.database.Type;
+import net.rnsqd.kitVault.kit.KitRecord;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -76,6 +77,21 @@ public final class SqliteDatabase extends AbstractDatabase {
 
     @Override
     public void save(String player) {
+
+    }
+
+    @Override
+    public boolean isCooldown(String player, KitRecord kitRecord) {
+        return false;
+    }
+
+    @Override
+    public long getCooldown(String player, KitRecord kitRecord) {
+        return 0;
+    }
+
+    @Override
+    public void addCooldown(String player, KitRecord kitRecord) {
 
     }
 }
